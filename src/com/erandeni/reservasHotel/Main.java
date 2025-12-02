@@ -1,7 +1,5 @@
 package com.erandeni.reservasHotel;
 
-import java.sql.SQLOutput;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.time.LocalDate;
@@ -20,14 +18,12 @@ import java.time.format.DateTimeFormatter;
  * • Se sugiere la clase Habitación, con los siguientes atributos: número, tipo, precio, disponibilidad.
  * • La clase cliente, con los siguientes atributos: cliente id, nombre, teléfono, email.
  * • La clase Reserva: código de reserva, cliente, habitación, fecha de inicio, fecha fin, total.
- * <p>
  * • La clase Hotel: nombre, lista habitaciones, lista clientes, lista reservas.
  * • Y la clase que contiene el método principal.
  * • Las validaciones:
  * Para fechas:
  * No se aceptan fechas vacías o con formato incorrecto.
  * La fecha de inicio no puede ser posterior a la de fin.
- * <p>
  * • Para la disponibilidad de habitación:
  * Antes de crear una reserva, verificar que la habitación esté libre.
  * Al cancelar una reserva, la habitación vuelve a estar disponible.
@@ -42,13 +38,10 @@ import java.time.format.DateTimeFormatter;
  */
 
 public class Main {
-    public static void main(String[] args) {
+    static void main(String[] args) {
         Scanner input = new Scanner(System.in);
         DateTimeFormatter formatoFechas = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         int opcion;
-        List<Reserva> reservas = new ArrayList<>();
-        Cliente cliente = null;
-        LocalDate fechaActual = LocalDate.now();
 
         System.out.println("BIENVENIDO AL PROGRAMA ADMIN HOTEL");
         //esta seccion eventualmente poodria funcionar como un login pero por ahora solo usamos un nombre ingresado
@@ -82,6 +75,8 @@ public class Main {
                     System.out.println("Habitacion registrada con número: " + numeroHabitacion);
                     break;
                 case 2:
+                    System.out.println("CLIENTES");
+                    hotel.mostrarClientes();
                     System.out.println("AGREGANDO DATOS DEL CLIENTE");
                     System.out.println("Nombre: ");
                     String nombreCliente = input.nextLine();
@@ -91,24 +86,17 @@ public class Main {
                     String telefonoCliente = input.nextLine();
                     System.out.println("Email: ");
                     String emailCliente = input.nextLine();
-                    cliente = new Cliente(nombreCliente, apellidoCliente, telefonoCliente, emailCliente);
-                    hotel.agregarCliente(cliente);
-                    System.out.println("Se ha agregado al cliente con los siguientes datos: " + cliente);
+
+                    Cliente cliente = new Cliente(nombreCliente, apellidoCliente, telefonoCliente, emailCliente);
+
+                    if (hotel.agregarCliente(cliente)) {
+                        System.out.println("✔ Cliente agregado con éxito.");
+                    } else {
+                        System.out.println("❌ No se pudo registrar. Intente nuevamente.");
+                    }
                     break;
                 case 3:
                     while (true) {
-                        LocalDate fechaLlegadaParsed;
-                        LocalDate fechaSalidaParsed;
-//                    System.out.println("Elija una opcion del menu: ");
-//                    System.out.println("1.Volver al menu principal.");
-//                    System.out.println("2. Consultar fechas para reservar.");
-//                    int opcionOuterReservas = input.nextInt();
-//                    input.nextLine();
-//
-//                    if (opcionOuterReservas == 1) {
-//                        System.out.println("Volviendo al menu principal...");
-//                        break;
-//                    } else if (opcionOuterReservas == 2) {
 
                         System.out.println("CONSULTANDO FECHAS DISPONIBLES PARA RESERVAR");
                         //solicitando fechas de llegada...
@@ -118,11 +106,24 @@ public class Main {
                         String mesLlegada = input.nextLine();
                         System.out.println("Año en formato 4 dígitos");
                         String anioLlegada = input.nextLine();
+
+//validaciones llegada
+                        if (diaLlegada.isEmpty() || mesLlegada.isEmpty() || anioLlegada.isEmpty()) {
+                            System.out.println("❌ Error: Ningún campo de la fecha de llegada puede estar vacío.");
+                            continue;
+                        }
                         if (diaLlegada.length() == 1) diaLlegada = "0" + diaLlegada;
                         if (mesLlegada.length() == 1) mesLlegada = "0" + mesLlegada;
-
                         String fechaLlegadaCompleta = diaLlegada + "/" + mesLlegada + "/" + anioLlegada;
-                        fechaLlegadaParsed = LocalDate.parse(fechaLlegadaCompleta, formatoFechas);
+
+                        LocalDate fechaLlegadaParsed;
+                        try {
+                            fechaLlegadaParsed = LocalDate.parse(fechaLlegadaCompleta, formatoFechas);
+                        } catch (Exception e) {
+                            System.out.println("❌ Formato de fecha inválido. Usa DD/MM/YYYY.");
+                            continue;
+                        }
+
 
                         //solicitando fechas de salida...
                         System.out.println("Fecha de salida: DD/MM/YYYY\nIndica el dia de salida: ");
@@ -131,14 +132,30 @@ public class Main {
                         String mesSalida = input.nextLine();
                         System.out.println("Año en formato 4 dígitos");
                         String anioSalida = input.nextLine();
+//validaciones salida
+                        if (diaSalida.isEmpty() || mesSalida.isEmpty() || anioSalida.isEmpty()) {
+                            System.out.println("Error: Ningún campo de la fecha de salida puede estar vacío.");
+                            continue;
+                        }
+
                         if (diaSalida.length() == 1) diaSalida = "0" + diaSalida;
                         if (mesSalida.length() == 1) mesSalida = "0" + mesSalida;
                         String fechaSalidaCompleta = diaSalida + "/" + mesSalida + "/" + anioSalida;
 
-                        fechaSalidaParsed = LocalDate.parse(fechaSalidaCompleta, formatoFechas);
-                        List<Habitacion> opcionesDisponibles = hotel.obtenerHabitacionesDisponibles(fechaLlegadaParsed, fechaSalidaParsed);
-
+                        LocalDate fechaSalidaParsed;
+                        try {
+                            fechaSalidaParsed = LocalDate.parse(fechaSalidaCompleta, formatoFechas);
+                        } catch (Exception e) {
+                            System.out.println("Formato inválido para la fecha de salida.");
+                            continue;
+                        }
+// llegada < salida
+                        if (!fechaSalidaParsed.isAfter(fechaLlegadaParsed)) {
+                            System.out.println("La fecha de salida debe ser posterior a la fecha de llegada.");
+                            continue;
+                        }
                         //corroborando si hay habitaciones disponibles...
+                        List<Habitacion> opcionesDisponibles = hotel.obtenerHabitacionesDisponibles(fechaLlegadaParsed, fechaSalidaParsed);
 
                         if (opcionesDisponibles.isEmpty()) {
                             System.out.println("No hay habitaciones disponibles.");
@@ -189,6 +206,17 @@ public class Main {
                         String telefono = input.nextLine();
                         System.out.println("Email:");
                         String email = input.nextLine();
+                        //validaciones del cliente de nuevo
+                        if (nombre.isEmpty() || apellido.isEmpty() || telefono.isEmpty() || email.isEmpty()) {
+                            System.out.println("❌ Error: Todos los campos del cliente son obligatorios.");
+                            continue; // vuelve a pedir los datos
+                        }
+                        if (!email.contains("@") || !email.contains(".")) {
+                            System.out.println("❌ Email inválido.");
+                            continue;
+                        }
+
+
                         System.out.println(":::::::::::::Habitacion:::::::: ");
                         System.out.println("Disponibles en esas fechas:");
                         for (int i = 0; i < opcionesDisponibles.size(); i++) {
@@ -202,11 +230,17 @@ public class Main {
                             System.out.println("Opción inválida. Volviendo al menú principal...");
                             break;
                         }
-
                         Habitacion habitacionElegida = opcionesDisponibles.get(seleccion - 1);
+//validando si la habitacion esta disponible...
+                        if (!hotel.habitacionDisponible(habitacionElegida, fechaLlegadaParsed, fechaSalidaParsed)) {
+                            System.out.println("❌ La habitación ya fue reservada mientras estabas ingresando datos. Intenta de nuevo.");
+                            continue;
+                        }
+
                         Cliente nuevoCliente = new Cliente(nombre, apellido, telefono, email);
                         Reserva nuevaReserva = new Reserva(nuevoCliente, habitacionElegida, fechaLlegadaParsed, fechaSalidaParsed);
                         hotel.agregarReserva(nuevaReserva);
+                        habitacionElegida.setDisponible(false);
                         System.out.println("Se ha creado la reserva... ");
                         System.out.printf(nuevaReserva.toString());
                         System.out.println("");
@@ -215,13 +249,41 @@ public class Main {
                     break;
                 case 4:
                     System.out.println("CONSULTANDO RESERVAS");
-                    for (Reserva res : hotel.getReservas()) {
-                        System.out.println(res.toString());
-                    }
+                    hotel.mostrarReservas();
                     break;
                 case 5:
                     System.out.println(":::::MODIFICAR ESTADO DE LA HABITACION::::");
 
+                    if (!hotel.mostrarHabitaciones()){
+                        break;
+                    }
+
+                    System.out.println("\nIngrese número de la habitación:");
+                    int numHab = input.nextInt();
+                    input.nextLine();
+
+                    Habitacion habitacionModificar = hotel.buscarHabitacionPorNumero(numHab);
+
+                    if (habitacionModificar == null) {
+                        System.out.println("Habitación no encontrada.");
+                        break;
+                    }
+                    System.out.println("\nEstado actual: " + (habitacionModificar.isDisponible() ? "Disponible" : "Ocupada"));
+                    System.out.println("¿Qué desea hacer?");
+                    System.out.println("1. Marcar como OCUPADA");
+                    System.out.println("2. Marcar como DISPONIBLE");
+                    int opEstado = input.nextInt();
+                    input.nextLine();
+
+                    if (opEstado == 1) {
+                        habitacionModificar.setDisponible(false);
+                        System.out.println("Habitación marcada como **OCUPADA**.");
+                    } else if (opEstado == 2) {
+                        habitacionModificar.setDisponible(true);
+                        System.out.println("Habitación marcada como **DISPONIBLE**.");
+                    } else {
+                        System.out.println("Opción inválida.");
+                    }
                     break;
                 case 6:
                     System.out.println("Saliendo del sistema ADMIN HOTEL");
