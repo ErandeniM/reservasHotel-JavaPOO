@@ -1,8 +1,11 @@
 package com.erandeni.reservasHotel;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Reserva {
+public class Reserva implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     Cliente cliente;
     Habitacion habitacion;
     String codigoReserva;
