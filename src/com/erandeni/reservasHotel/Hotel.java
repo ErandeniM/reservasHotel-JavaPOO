@@ -3,6 +3,7 @@ package com.erandeni.reservasHotel;
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDate;
+import java.io.*;
 
 public class Hotel {
     String nombre;
@@ -53,7 +54,7 @@ public class Hotel {
 
         // Si pasa todas las validaciones, agregar
         clientes.add(cliente);
-        System.out.println("✔ Cliente agregado correctamente.");
+      //  System.out.println("✔ Cliente agregado correctamente.");
         return true;
     }
 
@@ -120,7 +121,30 @@ public class Hotel {
         }
         return null;
     }
+    @SuppressWarnings("unchecked")
+    public void cargarReservas() {
+        File archivo = new File("reservas.dat");
+        if (!archivo.exists()) {
+            System.out.println("No hay archivo previo de reservas. Se iniciará uno nuevo.");
+            return;
+        }
+        try (ObjectInputStream entrada = new ObjectInputStream(new FileInputStream(archivo))) {
+            reservas = (List<Reserva>) entrada.readObject();
+            System.out.println("Reservas cargadas correctamente.");
+        } catch (Exception e) {
+            System.out.println("⚠ Error al cargar reservas: " + e.getMessage());
+        }
+    }
 
+
+    public void guardarReservas() {
+        try (ObjectOutputStream salida = new ObjectOutputStream(new FileOutputStream("reservas.dat"))) {
+            salida.writeObject(reservas);
+            System.out.println("Reservas guardadas correctamente.");
+        } catch (IOException e) {
+            System.out.println("Error al guardar las reservas: " + e.getMessage());
+        }
+    }
 
     public String getNombreHotel() {
         return nombre;
