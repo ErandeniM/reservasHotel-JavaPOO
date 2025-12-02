@@ -48,6 +48,7 @@ public class Main {
         System.out.println("Introduce el nombre del hotel: ");
         String nombreHotel = input.nextLine();
         Hotel hotel = new Hotel(nombreHotel);
+        hotel.cargarReservas();
 
         System.out.println("Bienvenido a " + hotel.getNombreHotel());
         do {
@@ -240,6 +241,7 @@ public class Main {
                         Cliente nuevoCliente = new Cliente(nombre, apellido, telefono, email);
                         Reserva nuevaReserva = new Reserva(nuevoCliente, habitacionElegida, fechaLlegadaParsed, fechaSalidaParsed);
                         hotel.agregarReserva(nuevaReserva);
+                        hotel.guardarReservas();
                         habitacionElegida.setDisponible(false);
                         System.out.println("Se ha creado la reserva... ");
                         System.out.printf(nuevaReserva.toString());
