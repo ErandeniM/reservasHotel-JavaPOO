@@ -33,6 +33,8 @@ public class Cliente {
         return clienteID;
     }
 
+    public String getNombre() {return nombre;}
+
     public String getNombreCompleto() {
         return nombre + " " + apellido;
     }
