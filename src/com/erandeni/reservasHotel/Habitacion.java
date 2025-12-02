@@ -13,17 +13,19 @@ public class Habitacion {
         disponible = true;
     }
 
+    public void setDisponible(boolean disponible) {
+        this.disponible = disponible;
+    }
 
     public String getTipo() {
         return tipo;
     }
-
     public int getNumero() {
         return this.numero;
     }
-
+    public boolean isDisponible() {return disponible;}
     public String toString() {
-        return "Habitacion " + tipo + ". Precio: " + precio;
+        return "Habitación " + tipo + ". Precio: " + precio;
     }
 
 
