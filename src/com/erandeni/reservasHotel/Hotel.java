@@ -14,6 +14,7 @@ public class Hotel {
         this.nombre = nombre;
         this.habitaciones = new ArrayList<>();
         this.reservas = new ArrayList<>();
+        this.clientes = new ArrayList<>();
     }
 
     public void agregarHabitacion(Habitacion habitacion) {
@@ -28,9 +29,34 @@ public class Hotel {
         return reservas;
     }
 
-    public void agregarCliente(Cliente cliente) {
-        this.clientes.add(cliente);
-}
+    public boolean agregarCliente(Cliente cliente) {
+
+        // Validación: nombre requerido
+        if (cliente.getNombre() == null || cliente.getNombre().trim().isEmpty()) {
+            System.out.println("Error: El nombre es obligatorio.");
+            return false;
+        }
+
+        // Validación: email válido
+        if (cliente.getEmail() == null || !cliente.getEmail().contains("@")) {
+            System.out.println("Error: Email inválido.");
+            return false;
+        }
+
+        // Validación: cliente duplicado por email
+        for (Cliente c : clientes) {
+            if (c.getEmail().equalsIgnoreCase(cliente.getEmail())) {
+                System.out.println("Error: Este cliente ya está registrado.");
+                return false;
+            }
+        }
+
+        // Si pasa todas las validaciones, agregar
+        clientes.add(cliente);
+        System.out.println("✔ Cliente agregado correctamente.");
+        return true;
+    }
+
 
     public boolean habitacionDisponible(Habitacion habitacion, LocalDate fechaInicio, LocalDate fechaFin) {
         for (Reserva reserva : reservas) {
@@ -46,6 +72,9 @@ public class Hotel {
     public List<Habitacion> obtenerHabitacionesDisponibles(LocalDate inicio, LocalDate fin) {
         List<Habitacion> habitacionesDisponibles = new ArrayList<>();
         for (Habitacion habitacion : habitaciones) {
+            if (!habitacion.isDisponible()) {
+                continue;
+            }
             if (habitacionDisponible(habitacion, inicio, fin)) {
                 habitacionesDisponibles.add(habitacion);
             }
@@ -53,6 +82,44 @@ public class Hotel {
         return habitacionesDisponibles;
     }
 
+    public boolean mostrarHabitaciones() {
+        if (habitaciones.isEmpty()) {
+            System.out.println("No hay habitaciones registradas.");
+            return false;
+        }
+
+        System.out.println("\nLista de habitaciones:");
+        for (Habitacion h : habitaciones) {
+            System.out.println("N° " + h.getNumero() + " - " + h.getTipo() + " → " +
+                    (h.isDisponible() ? "Disponible" : "Ocupada"));
+        }
+        return true;
+    }
+
+    public void mostrarClientes() {
+        if (clientes.isEmpty()) {
+            System.out.println("⚠ No hay clientes registrados.");
+            return;
+        }
+        clientes.forEach(System.out::println);
+    }
+
+    public void mostrarReservas() {
+        if (reservas.isEmpty()) {
+            System.out.println("⚠ No existen reservas en el sistema.");
+            return;
+        }
+        reservas.forEach(System.out::println);
+    }
+
+    public Habitacion buscarHabitacionPorNumero(int numero) {
+        for (Habitacion h : habitaciones) {
+            if (h.getNumero() == numero) {
+                return h;
+            }
+        }
+        return null;
+    }
 
 
     public String getNombreHotel() {
