@@ -1,6 +1,8 @@
 package com.erandeni.reservasHotel;
+import java.io.Serializable;
 
-public class Habitacion {
+public class Habitacion implements Serializable {
+    private static final long serialVersionUID = 1L;
     String tipo;
     int numero;
     double precio;
