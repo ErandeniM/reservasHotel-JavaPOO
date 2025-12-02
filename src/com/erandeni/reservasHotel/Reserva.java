@@ -10,9 +10,8 @@ public class Reserva {
     LocalDate fechaFin;
 
 
-
-    public Reserva(Cliente cliente,Habitacion habitacion, LocalDate fechaInicio, LocalDate fechaFin) {
-       this.codigoReserva = GeneradorDeID.generarCodigoReserva();
+    public Reserva(Cliente cliente, Habitacion habitacion, LocalDate fechaInicio, LocalDate fechaFin) {
+        this.codigoReserva = GeneradorDeID.generarCodigoReserva();
         this.cliente = cliente;
         this.habitacion = habitacion;
         this.fechaInicio = fechaInicio;
@@ -34,24 +33,23 @@ public class Reserva {
                 "\n}";
     }
 
-public Habitacion getHabitacion() {
-    return this.habitacion;
-}
-    public String getCodigoReserva() {
-        return codigoReserva;
+    public Habitacion getHabitacion() {
+        return this.habitacion;
     }
+
+    public String getCodigoReserva() {return codigoReserva;}
 
     public Cliente getCliente() {
         return this.cliente;
     }
+
     public LocalDate getFechaInicio() {
-        return  fechaInicio;
+        return fechaInicio;
     }
+
     public LocalDate getFechaFin() {
         return fechaFin;
     }
-
-
 
 
 }
